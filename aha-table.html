@@ -15,27 +15,43 @@
 <dom-module id="aha-table">
   <link rel="import" type="css" href="css/aha-table.css"/>
   <template>
+    
+    <!-- table for measuring... -->
+    <span style="visibility:hidden" id="measuring" class$="{{_getTableClass(tableRows, tableColumns)}}">
+      <span class="tr">
+        <template is="dom-repeat" items="{{meta}}" as="column">
+          <span class$="{{_getHeaderClass(column)}}">{{column.label}}</span>
+        </template>
+      </span>
+      <span class="tr">
+        <template is="dom-repeat" items="{{meta}}" as="column">
+          <span class$="{{_getCellClass(column.name)}}">{{_measureThing(column)}}</span>
+        </template>
+      </span>
+    </span>
 
     <div class="scroll-body">
 
-      <div class$="{{_getTableClass(tableRows, tableColumns)}}">
+      <span class$="{{_getTableClass(tableRows, tableColumns)}}">
 
         <!-- Header -->
-        <div class="tr">
-          <template is="dom-repeat" items="{{meta}}" as="column">
-            <span class$="{{_getHeaderClass(column)}}">
-              <label
+        <span class="tr">
+          <template is="dom-repeat" items="{{meta}}" as="column" index-as="columnIndex">
+            <span class$="{{_getHeaderClass(column)}}"
+                  style$="{{_getWidth(columnIndex)}}">
+              <span
                 class$="{{_getTextSortingClass(column, sortedColumn)}}"
                 on-click="_sort">{{column.label}}<i class$="{{_getSortingClass(column, sortedColumn, descending)}}"></i>
-              </label>
+              </span>
             </span>
           </template>
-        </div>
+        </span>
 
         <!-- Second Header (filter/select all) -->
-        <div class$="{{_getSecondHeaderClass(filterable)}}">
-          <template is="dom-repeat" items="{{meta}}" as="column" id="filterRepeat">
-            <span class="td filter--cell">
+        <span class$="{{_getSecondHeaderClass(filterable)}}">
+          <template is="dom-repeat" items="{{meta}}" as="column" id="filterRepeat" index-as="columnIndex">
+            <span class="td filter--cell"
+                  style$="{{_getWidth(columnIndex)}}">
               <!-- select all checkbox -->
               <template is="dom-if" if="{{_isSelectAllColumn(column)}}">
                 <span class="flex flex--center">
@@ -53,7 +69,7 @@
               </template>
             </span>
           </template>
-        </div>
+        </span>
 
         <!-- Data rows -->
         <template id="recordList" is="dom-repeat" items="{{displayedRows}}" as="internalRow">
@@ -61,8 +77,9 @@
           <div class$="{{_getRowClass(internalRow, internalRow._selected)}}" on-click="_clickRow">
 
             <!-- Data cells -->
-            <template is="dom-repeat" items="{{meta}}" as="column">
-              <span class$="{{_getCellClass(column.name)}}">
+            <template is="dom-repeat" items="{{meta}}" as="column" index-as="columnIndex">
+              <span class$="{{_getCellClass(column.name)}}"
+                    style$="{{_getWidth(columnIndex)}}">
                 <span class$="{{_getReaderClass(internalRow, column.name)}}">
 
                   <!-- selected column checkbox -->
@@ -90,7 +107,7 @@
           </div>
         </template>
 
-      </div>
+      </span>
 
     </div>
 
@@ -242,8 +259,13 @@
         filterable: true,
         editable: false,
         required: false,
-        selectAll: isSelectAll
+        selectAll: isSelectAll,
+        charactersToDisplay: 0
       };
+    },
+
+    _measureThing: function(column) {
+      return new Array(column.charactersToDisplay + 1).join('4');
     },
 
     /********** Filter/Sort main function *************/
@@ -289,15 +311,35 @@
     /********** Internal data structure ***********/
 
     _initializeInternalData: function() {
+
+      var maxCharactersPerColumn = {};
+
       // make internal data structure with shadow fields
       var internalData = [];
-      for(var i = 0; i < this.data.length; i++) {
+      for(var row = 0; row < this.data.length; row++) {
         internalData.push({
-          row: this.data[i],
+          row: this.data[row],
           _filtered: false,
           _selected: false
         });
+
+        // also, find the max # of characters for each column and add to meta
+        for(var col in this.data[row]) {
+          if(maxCharactersPerColumn[col] === null || maxCharactersPerColumn[col] === undefined ||
+            this.data[row][col].toString().length > maxCharactersPerColumn[col]) {
+            maxCharactersPerColumn[col] = this.data[row][col].toString().length;
+          }
+        }
       }
+
+      var index = 1;
+      for(var col in this.data[0]) {
+        this.meta[0].charactersToDisplay = 10; // 10 for Selected column
+        this.meta[index].charactersToDisplay = maxCharactersPerColumn[col];
+        console.log(this.meta[index].charactersToDisplay);
+        index++;
+      }
+
       return internalData;
     },
 
@@ -654,29 +696,29 @@
         datum = datum === undefined || datum === null ? '' : datum;
         return datum === "" ? blank : datum;
       } else {
-        if(column['max-column-character-width'] > 0) {
-          datum = this._clipDatumString(datum, column);
-        }
+//        if(column['max-column-character-width'] > 0) {
+//          datum = this._clipDatumString(datum, column);
+//        }
         return datum;
       }
     },
-    _clipDatumString: function(datum, column) {
-      var colWidth = column['max-column-character-width'];
-      if(datum.length > colWidth) {
-        if(column['ellipsis-clip-position'] === 'left') {
-          datum = '\u2026' + datum.substr(datum.length - colWidth, datum.length);
-        }
-        else if(column['ellipsis-clip-position'] === 'center') {
-          var datumLeftIndex = Math.floor(colWidth / 2),
-            datumRightIndex = colWidth - datumLeftIndex;
-          datum = datum.substr(0, datumLeftIndex) + '\u2026' + datum.substr(datum.length - datumRightIndex, datum.length);
-        }
-        else { //assume right
-          datum = datum.substr(0, colWidth) + '\u2026';
-        }
-      }
-      return datum;
-    },
+//    _clipDatumString: function(datum, column) {
+//      var colWidth = column['max-column-character-width'];
+//      if(datum.length > colWidth) {
+//        if(column['ellipsis-clip-position'] === 'left') {
+//          datum = '\u2026' + datum.substr(datum.length - colWidth, datum.length);
+//        }
+//        else if(column['ellipsis-clip-position'] === 'center') {
+//          var datumLeftIndex = Math.floor(colWidth / 2),
+//            datumRightIndex = colWidth - datumLeftIndex;
+//          datum = datum.substr(0, datumLeftIndex) + '\u2026' + datum.substr(datum.length - datumRightIndex, datum.length);
+//        }
+//        else { //assume right
+//          datum = datum.substr(0, colWidth) + '\u2026';
+//        }
+//      }
+//      return datum;
+//    },
     _isEqual: function(source, target) {
       return source === target;
     },
@@ -723,6 +765,11 @@
         classList.push('table--columns');
       }
       return classList.join(' ');
+    },
+    _getWidth: function(columnIndex) {
+      var maxWidth = this.$.measuring.getElementsByClassName("td")[columnIndex].offsetWidth;
+      console.log("width:" + maxWidth + "px");
+      return "width:" + maxWidth + "px";
     }
   });
 </script>

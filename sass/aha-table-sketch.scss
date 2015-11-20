@@ -59,10 +59,10 @@ $inuit-enable-btn--disabled     : true;
   width: 32px;
 }
 
-.th{
-  @extend th;
-  display: table-cell;
-}
+//.th{
+//  @extend th;
+//  display: table-cell;
+//}
 
 // making th--no-borders class specific enough to override other table.table.aha-table, etc. selectors
 .th--no-borders.th--no-borders.th--no-borders {
@@ -71,21 +71,39 @@ $inuit-enable-btn--disabled     : true;
   border-right: 0;
 }
 
-.table{
-  @extend table;
-  display: table !important;
+.tr {
+  display: block;
+  white-space: nowrap;
 }
 
-.tr{
-  @extend tr;
-  display: table-row;
+.th {
+  display: inline-block;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-.td{
-  @extend td;
-  display: table-cell;
-  vertical-align: middle;
+.td {
+  display: inline-block;
+  border: 1px black solid;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
+
+//.table{
+//  @extend table;
+//  display: table !important;
+//}
+//
+//.tr{
+//  @extend tr;
+//  display: table-row;
+//}
+//
+//.td{
+//  @extend td;
+//  display: table-cell;
+//  vertical-align: middle;
+//}
 
 :host {
   display: block;
@@ -129,7 +147,7 @@ label {
 .text-input--bare {
   overflow: auto;
   height: 1em;
-  width: 100%;
+  //width: 100%;
   margin: 0;
   padding: 0;
   &:focus {
