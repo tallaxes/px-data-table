@@ -15,12 +15,13 @@
 <dom-module id="aha-table">
   <link rel="import" type="css" href="css/aha-table.css"/>
   <template>
-    
+
     <!-- table for measuring... -->
     <span style="visibility:hidden" id="measuring" class$="{{_getTableClass(tableRows, tableColumns)}}">
       <span class="tr">
         <template is="dom-repeat" items="{{meta}}" as="column">
-          <span class$="{{_getHeaderClass(column)}}">{{column.label}}</span>
+          <span class$="{{_getHeaderClass(column)}}">{{column.label}}<i class="u-ml- sorting fa fa-caret-down"></i></span>
+          </span>
         </template>
       </span>
       <span class="tr">
@@ -768,6 +769,9 @@
     },
     _getWidth: function(columnIndex) {
       var maxWidth = this.$.measuring.getElementsByClassName("td")[columnIndex].offsetWidth;
+      if(this.$.measuring.getElementsByClassName("th")[columnIndex].offsetWidth > maxWidth) {
+        maxWidth = this.$.measuring.getElementsByClassName("th")[columnIndex].offsetWidth;
+      }
       console.log("width:" + maxWidth + "px");
       return "width:" + maxWidth + "px";
     }
