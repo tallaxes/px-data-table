@@ -18,9 +18,9 @@ Element that provides pagination.
 				<span class="u-mr--">{{pagesizetitle}}</span>
 				<select id="pageSizeSelect" on-change="_changeDropDown">
           <option>5</option>
-          <option selected>10</option>
+          <option>10</option>
           <option>20</option>
-          <option>50</option>
+          <option selected>50</option>
           <option>100</option>
         </select>
 			</span>
@@ -71,7 +71,7 @@ Element that provides pagination.
        */
       pageSize: {
         type: Number,
-        value: 10,
+        value: 50,
         notify: true,
         readOnly: true
       },

@@ -181,8 +181,7 @@
     },
 
     observers: [
-      '_updateDisplayedRows(firstItemIndex)', // when the first item to display changes
-      '_updateDisplayedRows(pageSize)' // when the size of the page changes
+      '_updateDisplayedRows(firstItemIndex, pageSize)', // when the first item to display changes or when the size of the page changes
     ],
 
     _dataChanged: function() {
@@ -197,8 +196,9 @@
       }
 
       this.internalData = this._initializeInternalData();
-
-      this._filterSortAndUpdateDisplayedTable();
+      if(this.internalData) {
+        this._filterSortAndUpdateDisplayedTable();
+      }
     },
 
     _selectableChanged: function(newSelectable) {
@@ -246,8 +246,10 @@
 
       // reset back to unfiltered
       // leave _selected as is since selected rows should stay selected
-      for(var i = 0; i < this.internalData.length; i++) {
-        this._setInternalDataAt(this.internalData[i], '_filtered', false);
+      if(this.filterable) {
+        for(var i = 0; i < this.internalData.length; i++) {
+          this._setInternalDataAt(this.internalData[i], '_filtered', false);
+        }
       }
 
       // sort
@@ -264,11 +266,14 @@
       // count total number of rows
       var count = 0;
       var self = this;
+      if(this.filterable) {
       this.internalData.forEach(function(row) {
         if(!self._getInternalDataAt(row, '_filtered')) {
           count++;
         }
-      });
+      });} else {
+        count = this.data.length
+      }
       this.set('numberOfItems', count);
 
       // with filtering/sorting, it's best just to go back to the first page
