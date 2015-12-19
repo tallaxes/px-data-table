@@ -689,127 +689,253 @@ document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
 
+/*
+{
+  testDescription : 'There should be 17 columns in the table1 fixture',
+  rootElement : document.querySelector('#dataTable > .scroll-body.style-scope.aha-table > div > :nth-child(4)'),
+  assertFunction: function(rootElement) {
+    var childSpanSelector = ':nth-child(4) > .td.style-scope.aha-table';
+    var columnCount = rootElement.querySelectorAll(childSpanSelector).length;
+    // There should be 17 such spans
+    return (columnCount === 17);
+  }
+}
+*/
+function testElement(options) {
+  var testDescription, rootElement, eventSource, eventString, assertFunction;
+  var isAsync = false;
+  function failTest(message) {
+    test(message, function() {
+      assert.isTrue(false);
+    });
+  }
+  if (typeof options === 'object') {
+    testDescription = options['description'] || '';
+    rootElement = options['root'] || document;
+    eventSource = options['eventSource'] || '';
+    eventString = options['event'] || '';
+    assertFunction = options['assertFunction'] || function() { return true; };
+  }
+  // fail the test if options was not provided
+  else {
+    failTest(testDescription + ' Invalid test spec');
+    return;
+  }
+
+  function deriveRoot() {
+    if (typeof rootElement === 'string') {
+      rootElement = document.querySelector(rootElement);
+    }
+  }
+
+  // if test is asynchronous (i.e., event was provided)
+  if (eventString !== '') {
+    isAsync = true;
+  }
+  // at this point eventSource is guaranteed to be an HTML element
+  if (isAsync) {
+    test(testDescription, function(done) {
+      deriveRoot();
+      if (!(rootElement instanceof HTMLElement) && !(rootElement instanceof HTMLDocument)) {
+        assert.isTrue(false);
+        done();
+        return;
+      }
+      if ( !(eventSource instanceof HTMLElement) &&
+           !(typeof eventSource === 'string') ) {
+        assert.isTrue(false);
+        done();
+        return;
+      }
+      if (typeof eventSource === 'string') {
+        eventSource = rootElement.querySelector(eventSource);
+      }
+      if (eventSource === null) {
+        assert.isTrue(false);
+        done();
+        return;
+      }
+      eventSource.addEventListener(eventString, function() {
+        assert.isTrue(assertFunction(rootElement));
+        done();
+      });
+      eventSource.dispatchEvent(new Event(eventString));
+    })
+  }
+  else {
+    test(testDescription, function() {
+      deriveRoot();
+      if (!(rootElement instanceof HTMLElement) && !(rootElement instanceof HTMLDocument)) {
+        assert.isTrue(false);
+        return;
+      }
+      assert.isTrue(assertFunction(rootElement));
+    })
+  }
+}
+
 function runTests() {
   suite('Unit Tests for Data Table', function() {
 
-  test('Polymer exists', function() {
-    assert.isTrue(Polymer !== null);
-  });
-  test('table1 fixture is created', function() {
-    assert.isTrue(document.getElementById('table1') !== null);
-  });
-
-  test('table2 fixture is created', function() {
-    assert.isTrue(document.getElementById('table2') !== null);
-  });
-  test('table3 fixture is created', function() {
-    assert.isTrue(document.getElementById('table3') !== null);
-  });
-  test('table4 fixture is created', function() {
-    assert.isTrue(document.getElementById('table4') !== null);
-  });
-  test('myTable fixture is created', function() {
-    assert.isTrue(document.getElementById('myTable') !== null);
-  });
-
-  // Spot checks for correct table structure, cell values and control states
-
-  test('There should be 17 columns in the table1 fixture', function() {
-    // Select a div corresponding to a data row in the table
-    var divSelector = '#dataTable > .scroll-body.style-scope.aha-table > div > :nth-child(4)';
-    var divRow = document.querySelector(divSelector);
-    // Select all <span> children of divRow
-    var childSpanSelector = ':nth-child(4) > .td.style-scope.aha-table';
-    var columnCount = divRow.querySelectorAll(childSpanSelector).length;
-    // There should be 17 such spans
-    assert.equal(columnCount, 17);
-  });
-  test('Value of 5th data row 2nd column of first table should be "Rita Lopez"', function() {
-    var fixture = document.getElementById('table1');
-    var selector = '#dataTable :nth-child(7) .aha-name-td';
-    var span = fixture.querySelector(selector);
-    assert.equal(span.innerHTML.indexOf('Rita Lopez') >= 0, true);
-  });
-  test('Row count for first table should be 26', function() {
-    var fixture = document.getElementById('table1');
-    var selector = '.summary.style-scope.px-pagination :nth-child(4)';
-    var span = fixture.querySelector(selector);
-    assert.equal(span.innerHTML, '26');
-  });
-  // Spot checks for correct values in table cells and controls'
-  test('First Name displays only first 10 characters  if length of the text is greater than 10 characters and elipse at the right', function() {
-    var fixture = document.getElementById('myTable');
-    var selector = '#dataTable > div.scroll-body div:nth-child(3) > .aha-first-td';
-    var span = fixture.querySelector(selector);
-    assert.equal(span.innerHTML.indexOf('Isabel lon…') >= 0, true);
-  });
-  test('Email displays only last 10 characters displayed if length of the text is greater than 10 characters', function() {
-    var fixture = document.getElementById('myTable');
-    var selector = '#dataTable > div.scroll-body div:nth-child(3) > .aha-image-td';
-    var span = fixture.querySelector(selector);
-    assert.equal(span.innerHTML.indexOf('…/twitter/enda/73.jpg') >= 0, true);
-  });
-  test('Address displays total 10 characters with ellipse in the center if length of the text is greater than 10 characters', function() {
-    var fixture = document.getElementById('myTable');
-    var selector = '#dataTable > div.scroll-body div:nth-child(3) > .aha-address-td';
-    var span = fixture.querySelector(selector);
-    assert.equal(span.innerHTML.indexOf('3 Vis…Place') >= 0, true);
-  });
-
-  // Spot checks for event upon interaction with pagination controls
-  // The root element for pagination
-  var paginationRoot = document.getElementById('pagination');
-  // Selector for page 3 link
-  var span3Selector = '.paging.style-scope.px-pagination > span > :nth-child(3)';
-  test('Pagination updates when page 3 link is clicked', function(done) {
-    // Page 3 link
-    var span3 = paginationRoot.querySelector(span3Selector);
-    span3.addEventListener('click', function(e) {
-      var startCountSelector = 'span.summary.style-scope.px-pagination > :nth-child(1)';
-      // Element that shows starting record number in '<start>-<end> of <total> in Pagination'
-      var startCount = paginationRoot.querySelector(startCountSelector);
-      // startCount should show '21' when page 3 is clicked
-      assert.equal(startCount.innerHTML, '21');
-      // End the test
-      done();
+    test('Polymer exists', function() {
+      assert.isTrue(Polymer !== null);
     });
-    // Trigger the CLICK event on page 3 link
-    span3.click();
-  });
-
-  // Spot checks for filtering functionality
-  test('Matching records are returned when filter text is entered', function(done) {
-    var filterableTableRoot = document.querySelector('#table2');
-    var lastNameFilterSelector = 'div > div.tr.tr--filter > :nth-child(3) > input';
-    var lastNameFilter = filterableTableRoot.querySelector(lastNameFilterSelector);
-    lastNameFilter.addEventListener('keyup', function(e){
-      setTimeout(function() {
-        var secondReturnedRowFirstNameSelector = '#dataTable :nth-child(4) .aha-first-td';
-        var secondReturnedRowFirstName = filterableTableRoot.querySelector(secondReturnedRowFirstNameSelector);
-        assert.equal(secondReturnedRowFirstName.innerHTML.indexOf('Rita') >= 0, true);
-        done(); // end the test
-      }, 0);
+    test('table1 fixture is created', function() {
+      assert.isTrue(document.getElementById('table1') !== null);
     });
-    // Trigger filter edit event and provide a filter value
-    lastNameFilter.value = 'wo';
-    lastNameFilter.dispatchEvent(new Event('keyup'));
-  })
 
-  // Spot checks for sorting functionality
-  test('Records are sorted correctly when a sortable column header is clicked', function(done) {
-    var sortableTableRoot = document.querySelector('#table1');
-    var firstNameHeaderSelector = '.aha-first-th > span';
-    var firstNameHeader = sortableTableRoot.querySelector(firstNameHeaderSelector);
-    firstNameHeader.addEventListener('click', function(e){
-      setTimeout(function() {
-        var tenthReturnedRowLastNameSelector = ':nth-child(12) > .aha-last-td > span > span';
-        var tenthReturnedRowLastName = sortableTableRoot.querySelector(tenthReturnedRowLastNameSelector);
-        assert.equal(tenthReturnedRowLastName.innerHTML.indexOf('Wooten') >= 0, true);
-        done(); // end the test
-      }, 0)
+    test('table2 fixture is created', function() {
+      assert.isTrue(document.getElementById('table2') !== null);
     });
-    // Trigger a click on the First Name column header
-    firstNameHeader.click();
-  })
+    test('table3 fixture is created', function() {
+      assert.isTrue(document.getElementById('table3') !== null);
+    });
+    test('table4 fixture is created', function() {
+      assert.isTrue(document.getElementById('table4') !== null);
+    });
+    test('myTable fixture is created', function() {
+      assert.isTrue(document.getElementById('myTable') !== null);
+    });
+
+    // Spot checks for correct table structure, cell values and control states
+    /*
+    test('There should be 17 columns in the table1 fixture', function() {
+      // Select a div corresponding to a data row in the table
+      // Select all <span> children of divRow
+      var divRow = document.querySelector('#dataTable > .scroll-body.style-scope.aha-table > div > :nth-child(4)');
+      var childSpanSelector = ':nth-child(4) > .td.style-scope.aha-table';
+      var columnCount = divRow.querySelectorAll(childSpanSelector).length;
+      // There should be 17 such spans
+      assert.equal(columnCount, 17);
+    });
+    */
+
+    testElement({
+      description : 'There should be 17 columns in the table1 fixture',
+      root : '#dataTable > .scroll-body.style-scope.aha-table > div > :nth-child(4)',
+      assertFunction : function(rootElement) {
+        var childSpanSelector = ':nth-child(4) > .td.style-scope.aha-table';
+        var columnCount = rootElement.querySelectorAll(childSpanSelector).length;
+        // There should be 17 such spans
+        return (columnCount === 17);
+      }
+    });
+
+    /*
+    test('Value of 5th data row 2nd column of first table should be "Rita Lopez"', function() {
+      var fixture = document.getElementById('table1');
+      var selector = '#dataTable :nth-child(7) .aha-name-td';
+      var span = fixture.querySelector(selector);
+      assert.equal(span.innerHTML.indexOf('Rita Lopez') >= 0, true);
+    });
+    */
+
+    testElement({
+      description : 'Value of 5th data row 2nd column of first table should be "Rita Lopez"',
+      root : '#table1',
+      assertFunction : function(rootElement) {
+        var selector = '#dataTable :nth-child(7) .aha-name-td';
+        var span = rootElement.querySelector(selector);
+        return span.innerHTML.indexOf('Rita Lopez') >= 0;
+      }
+    });
+
+    test('Row count for first table should be 26', function() {
+      var fixture = document.getElementById('table1');
+      var selector = '.summary.style-scope.px-pagination :nth-child(4)';
+      var span = fixture.querySelector(selector);
+      assert.equal(span.innerHTML, '26');
+    });
+    // Spot checks for correct values in table cells and controls'
+    test('First Name displays only first 10 characters  if length of the text is greater than 10 characters and elipse at the right', function() {
+      var fixture = document.getElementById('myTable');
+      var selector = '#dataTable > div.scroll-body div:nth-child(3) > .aha-first-td';
+      var span = fixture.querySelector(selector);
+      assert.equal(span.innerHTML.indexOf('Isabel lon…') >= 0, true);
+    });
+    test('Email displays only last 10 characters displayed if length of the text is greater than 10 characters', function() {
+      var fixture = document.getElementById('myTable');
+      var selector = '#dataTable > div.scroll-body div:nth-child(3) > .aha-image-td';
+      var span = fixture.querySelector(selector);
+      assert.equal(span.innerHTML.indexOf('…/twitter/enda/73.jpg') >= 0, true);
+    });
+    test('Address displays total 10 characters with ellipse in the center if length of the text is greater than 10 characters', function() {
+      var fixture = document.getElementById('myTable');
+      var selector = '#dataTable > div.scroll-body div:nth-child(3) > .aha-address-td';
+      var span = fixture.querySelector(selector);
+      assert.equal(span.innerHTML.indexOf('3 Vis…Place') >= 0, true);
+    });
+
+    // Spot checks for event upon interaction with pagination controls
+    // The root element for pagination
+    /*
+    var paginationRoot = document.getElementById('pagination');
+    // Selector for page 3 link
+    var span3Selector = '.paging.style-scope.px-pagination > span > :nth-child(3)';
+    test('Pagination updates when page 3 link is clicked', function(done) {
+      // Page 3 link
+      var span3 = paginationRoot.querySelector(span3Selector);
+      span3.addEventListener('click', function(e) {
+        var startCountSelector = 'span.summary.style-scope.px-pagination > :nth-child(1)';
+        // Element that shows starting record number in '<start>-<end> of <total> in Pagination'
+        var startCount = paginationRoot.querySelector(startCountSelector);
+        // startCount should show '21' when page 3 is clicked
+        assert.equal(startCount.innerHTML, '21');
+        // End the test
+        done();
+      });
+      // Trigger the CLICK event on page 3 link
+      span3.dispatchEvent( new Event('click'));
+    });
+    */
+
+    testElement({
+      description: 'Pagination updates when page 3 link is clicked',
+      root: '#pagination',
+      eventSource: '.paging.style-scope.px-pagination > span > :nth-child(3)',
+      event: 'click',
+      assertFunction: function(rootElement) {
+        var startCountSelector = 'span.summary.style-scope.px-pagination > :nth-child(1)';
+        // Element that shows starting record number in '<start>-<end> of <total> in Pagination'
+        var startCount = rootElement.querySelector(startCountSelector);
+        // startCount should show '21' when page 3 is clicked
+        return (startCount.innerHTML === '21');
+      }
+    });
+
+    // Spot checks for filtering functionality
+    test('Matching records are returned when filter text is entered', function(done) {
+      var filterableTableRoot = document.querySelector('#table2');
+      var lastNameFilterSelector = 'div > div.tr.tr--filter > :nth-child(3) > input';
+      var lastNameFilter = filterableTableRoot.querySelector(lastNameFilterSelector);
+      lastNameFilter.addEventListener('keyup', function(e){
+        setTimeout(function() {
+          var secondReturnedRowFirstNameSelector = '#dataTable :nth-child(4) .aha-first-td';
+          var secondReturnedRowFirstName = filterableTableRoot.querySelector(secondReturnedRowFirstNameSelector);
+          assert.equal(secondReturnedRowFirstName.innerHTML.indexOf('Rita') >= 0, true);
+          done(); // end the test
+        }, 0);
+      });
+      // Trigger filter edit event and provide a filter value
+      lastNameFilter.value = 'wo';
+      lastNameFilter.dispatchEvent(new Event('keyup'));
+    })
+
+    // Spot checks for sorting functionality
+    test('Records are sorted correctly when a sortable column header is clicked', function(done) {
+      var sortableTableRoot = document.querySelector('#table1');
+      var firstNameHeaderSelector = '.aha-first-th > span';
+      var firstNameHeader = sortableTableRoot.querySelector(firstNameHeaderSelector);
+      firstNameHeader.addEventListener('click', function(e){
+        setTimeout(function() {
+          var tenthReturnedRowLastNameSelector = ':nth-child(12) > .aha-last-td > span > span';
+          var tenthReturnedRowLastName = sortableTableRoot.querySelector(tenthReturnedRowLastNameSelector);
+          assert.equal(tenthReturnedRowLastName.innerHTML.indexOf('Wooten') >= 0, true);
+          done(); // end the test
+        }, 0)
+      });
+      // Trigger a click on the First Name column header
+      firstNameHeader.click();
+    })
   });
 };
