@@ -1,0 +1,59 @@
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>px-data-table Demo</title>
+
+    <script src="../webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <link rel="import" href="px-data-table.html" />
+    <link rel="import" href="../iron-ajax/iron-ajax.html" />
+    <link rel="import" href="../px-theme/px-theme.html"/>
+    <link rel="import" href="../px-vis-spark/px-vis-spark.html"/>
+  </head>
+
+  <body unresolved>
+    <template is="dom-bind">
+      <iron-ajax id="test" url="striplist.json" last-response="{{data}}" auto></iron-ajax>
+
+      <h3>Striplist</h3>
+
+      <px-data-table id="mytable" hide-pagination-control table-rows table-data="{{data}}">
+        <px-data-table-column
+          name="status"
+          type="html">
+        </px-data-table-column>
+        <px-data-table-column
+          name="assetName"
+          label="Asset Name"
+          type="html"
+          sortable>
+        </px-data-table-column>
+        <px-data-table-column
+          name="availability"
+          type="html"
+          sortable>
+        </px-data-table-column>
+        <px-data-table-column
+          name="reliability"
+          type="html"
+          sortable>
+        </px-data-table-column>
+        <px-data-table-column
+          name="starts"
+          type="html"
+          sortable>
+        </px-data-table-column>
+        <px-data-table-column
+          name="spark"
+          type="html"
+          sortable>
+        </px-data-table-column>
+      </px-data-table>
+
+    </template>
+  </body>
+
+</html>

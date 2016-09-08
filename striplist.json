@@ -1,0 +1,43 @@
+[
+  {
+    "status": "<i class='fa fa-circle' style='color:green;'></i>",
+    "assetName": "<span class='caps'>Asset 123456</span>",
+    "availability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>99.9%</h2>",
+    "reliability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>87%</h2>",
+    "starts": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>4</h2>",
+    "spark": "<px-vis-spark type='bar' width='250' height='25' data='[1,3,2,5,2]'></px-vis-spark>"
+  },
+  {
+    "status": "<i class='fa fa-circle' style='color:orange;'></i>",
+    "assetName": "<span class='caps'>Asset 593842</span>",
+    "availability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>99.7%</h2>",
+    "reliability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>89%</h2>",
+    "starts": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>7</h2>",
+    "spark": "<px-vis-spark type='bar' width='250' height='25' data='[4,1,5,2,4]'></px-vis-spark>"
+  },
+  {
+    "status": "<i class='fa fa-circle' style='color:green;'></i>",
+    "assetName": "<span class='caps'>Asset 103848</span>",
+    "availability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>99.6%</h2>",
+    "reliability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>83%</h2>",
+    "starts": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>8</h2>",
+    "spark": "<px-vis-spark type='bar' width='250' height='25' data='[3,7,9,1,1]'></px-vis-spark>"
+  },
+  {
+    "status": "<i class='fa fa-circle' style='color:red;'></i>",
+    "assetName": "<span class='caps'>Asset 194847</span>",
+    "availability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>99.9%</h2>",
+    "reliability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>97%</h2>",
+    "starts": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>3</h2>",
+    "spark": "<px-vis-spark type='bar' width='250' height='25' data='[2,2,2,5,7]'></px-vis-spark>"
+  },
+  {
+    "status": "<i class='fa fa-circle' style='color:green;'></i>",
+    "assetName": "<span class='caps'>Asset 108384</span>",
+    "availability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>99.4%</h2>",
+    "reliability": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>91%</h2>",
+    "starts": "<h2 class='gamma' style='margin-top:0;margin-bottom:0;'>9</h2>",
+    "spark": "<px-vis-spark type='bar' width='250' height='25' data='[6,3,1,3,2]'></px-vis-spark>"
+  }
+
+]
