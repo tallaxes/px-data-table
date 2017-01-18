@@ -9,6 +9,13 @@
 <dom-module id="px-data-table-cell">
   <template>
     <style include="px-data-table-cell-styles"></style>
+    <style>
+      /*:host {
+        --cell--value__highlight--color__high: red;
+        --cell--value__highlight--color__medium: red;
+        --cell--value__highlight--color__low: red;
+      }*/
+    </style>
 
     <span class$="{{_getReaderClass(_editing)}}" on-mouseover='onCellHovered' on-mouseout='onCellUnHovered'>
 
@@ -28,6 +35,11 @@
         </template>
       </px-edit-cell>
       <!--dropdown template  -->
+
+      <template is="dom-if" if="{{_isEqual(cellType, 'selected')}}">
+        <input type="checkbox" checked="{{selected}}"/>
+      </template>
+
       <template is="dom-if" if="{{_isEqual(cellType, 'dropdown')}}">
         <div class="flex__item cell--container">
           <span>
@@ -63,9 +75,6 @@
             </template>
           </span>
         </div>
-      </template>
-      <!-- icon template -->
-      <template is="dom-if" if="{{isNotEqual(cellType, 'dropdown')}}">
         <div class="fa fa-fw cell-status--container">
           <iron-icon class$="{{_getCellIconClass(_showEditIcon, _editing, cellValidation.passedValidation)}}"
             icon="{{_getCellIcon(_showEditIcon, _editing, cellValidation.passedValidation)}}">
@@ -80,7 +89,6 @@
           </template>
         </div>
       </template>
-      <!-- icon template -->
     </span>
     <!-- html content -->
     <template is="dom-if" if="{{_isEqual(cellType,'html')}}">
@@ -139,11 +147,12 @@
           type: HTMLElement,
           value: null
         },
-        cellSelected:{
+        selected:{
           type: Boolean,
           value: false,
           observer: "_cellSelected"
         },
+
         cellHighlighted:{
           type: Object,
           value: function(){
@@ -235,7 +244,7 @@
         }
         return;
       },
-      isNotEqual: function(source, target) {
+      _isNotEqual: function(source, target) {
         if (!Array.isArray(target) || typeof target !== 'object') {
           return source !== target;
         }
@@ -270,7 +279,7 @@
         var datum = this.cellValue,
             classList = [];
 
-        classList = (this.cellType ==='dropdown') ? ['flex', 'ddviewing'] : ['flex', 'viewing'];
+        classList = (this.cellType ==='dropdown') ? ['flex', 'ddviewing'] : ['flex', 'viewing', 'flex--center'];
 
         if(datum === null || datum === undefined || typeof datum === 'string' && datum.trim().length === 0) {
           classList.push('empty');
@@ -366,7 +375,15 @@
         }
         return classList.join(' ');
       },
+      // _getSelectedCellClass: function(selected, rowHighlighted){
+      //   var classList = ['td'];
+      //   classList.push(selected ? 'selected-cell__selected' : '');
+      //   classList.push(rowHighlighted.value? rowHighlighted.highlightClass : '');
+      //
+      //   return classList.join(' ');
+      // },
       _cellSelected: function(selected){
+        console.log(this.cellValue + '  ' + this.selected)
         if (this.rowHighlighted && this.rowHighlighted.value){
           this.toggleClass('cell--value__highlight--selected__row', selected);
         }
@@ -374,7 +391,8 @@
           this.toggleClass('cell--value__highlight--selected', selected);
         }
         else{
-          this.toggleClass('selected', selected);
+          console.log('here');
+          this.toggleClass('selected', this.selected);
         }
       },
       _updateHighlight: function(cellHighlight, rowHighlight){
