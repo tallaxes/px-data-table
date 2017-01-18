@@ -975,14 +975,8 @@
       }
     },
     _clickSelectAll: function(e) {
-      if(e.target.checked) {
-        this._setAllRows(true); // selected
-      }
-      else {
-        this._setAllRows(false); // unselected
-      }
+      this._setAllRows(e.target.checked);
     },
-
     _setAllRows: function(isSelected) {
       var i,
           len;

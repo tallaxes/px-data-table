@@ -375,25 +375,13 @@
         }
         return classList.join(' ');
       },
-      // _getSelectedCellClass: function(selected, rowHighlighted){
-      //   var classList = ['td'];
-      //   classList.push(selected ? 'selected-cell__selected' : '');
-      //   classList.push(rowHighlighted.value? rowHighlighted.highlightClass : '');
-      //
-      //   return classList.join(' ');
-      // },
       _cellSelected: function(selected){
-        console.log(this.cellValue + '  ' + this.selected)
-        if (this.rowHighlighted && this.rowHighlighted.value){
-          this.toggleClass('cell--value__highlight--selected__row', selected);
-        }
-        else if (this.cellHighlighted && this.cellHighlighted.value){
-          this.toggleClass('cell--value__highlight--selected', selected);
-        }
-        else{
-          console.log('here');
-          this.toggleClass('selected', this.selected);
-        }
+        var cellHighlighted = this.cellHighlighted && this.cellHighlighted.value,
+            rowHighlighted = this.rowHighlighted && this.rowHighlighted.value;
+
+        this.toggleClass('cell--value__highlight--selected__row', rowHighlighted && selected);
+        this.toggleClass('cell--value__highlight--selected', cellHighlighted && selected);
+        this.toggleClass('selected', !cellHighlighted && !rowHighlighted && selected);
       },
       _updateHighlight: function(cellHighlight, rowHighlight){
         this._clearHighlight();
