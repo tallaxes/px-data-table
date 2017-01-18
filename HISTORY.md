@@ -1,3 +1,15 @@
+v1.15.10
+==================
+* fixed failing unit test with new grays
+
+v1.15.8
+==================
+* hide ms-clear to fix issue #90 in IE
+
+v1.15.7
+==================
+* Update colors design to pick up new colors
+
 v1.15.6
 ==================
 * changing ghp.sh to account for Alpha releases
