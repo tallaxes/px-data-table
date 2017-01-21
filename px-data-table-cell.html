@@ -385,14 +385,25 @@
       },
       _updateHighlight: function(cellHighlight, rowHighlight){
         this._clearHighlight();
-        if(rowHighlight) {
-          this.toggleClass(this.rowHighlighted.highlightClass, rowHighlight);
+
+        if(rowHighlight && !cellHighlight) {
+          if(this.rowHighlighted.highlightColor){
+            this.style.background = this.rowHighlighted.highlightColor;
+          } else{
+            this.toggleClass(this.rowHighlighted.highlightClass, rowHighlight);
+          }
         }
         if(cellHighlight){
-          this.toggleClass(this.cellHighlighted.highlightClass, cellHighlight);
+          if(this.cellHighlighted.highlightColor){
+            this.style.background = this.cellHighlighted.highlightColor;
+
+          } else{
+            this.toggleClass(this.cellHighlighted.highlightClass, cellHighlight);
+          }
         }
       },
       _clearHighlight: function(){
+        this.style.background = '';
         this.toggleClass('cell--value__highlight--color__high', false);
         this.toggleClass('cell--value__highlight--color__medium', false);
         this.toggleClass('cell--value__highlight--color__low', false);

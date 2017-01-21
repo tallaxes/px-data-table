@@ -1375,32 +1375,60 @@
     _getHighlightValue: function(row, column, high) {
       var highlightElements = Polymer.dom(column).querySelectorAll('px-data-table-highlight'),
           doHighlight = false,
-          highlightObj = {value:false},
+          cellHighlightObj = {value:false},
+          rowHightlightObj = {value:false},
           highlightClass;
 
       highlightElements.forEach(function(highlightEl) {
+        // are we highlighting?
         doHighlight = highlightEl.highlight(this._getInternalDataAt(row, column.name));
-        if (highlightObj.value && doHighlight) {
-          if(highlightObj.highlightValue === 'low'){
-            highlightObj.highlightClass = 'cell--value__highlight--color__' + highlightEl.highlightValue;
-          } else if(highlightObj.highlightValue === 'medium'){
-            if (highlightEl.highlightValue === 'high') {
-              highlightObj.highlightClass = 'cell--value__highlight--color__' + highlightEl.highlightValue;
-            }
-          } else {
-            highlightObj.highlightClass = 'cell--value__highlight--color__' + highlightEl.highlightValue;
-          }
-        } else if(!highlightObj.value) {
-          highlightObj.value = doHighlight;
-          highlightObj.highlightClass = 'cell--value__highlight--color__' + highlightEl.highlightValue;
-        }
 
         if (highlightEl.highlightType === 'row') {
-          this._setInternalDataAt(row, '_highlight', highlightObj);
-          highlightObj = {value: false};
-          // debugger;
+          rowHightlightObj = this._figureOutHighlight(rowHightlightObj, doHighlight, highlightEl);
         }
+
+        if (highlightEl.highlightType === 'cell') {
+          cellHighlightObj = this._figureOutHighlight(cellHighlightObj, doHighlight, highlightEl);
+        }
+
+        //create most 'important'
+        //mutate thing so cell picks it up
+
+        //process cells
+        //create most 'important'
+        //return thing so cell picks it up.
+
+
       }.bind(this));
+      this._setInternalDataAt(row, '_highlight', rowHightlightObj);
+      return cellHighlightObj;
+    },
+
+
+    _figureOutHighlight: function(highlightObj, doHighlight, highlightEl){
+      if (highlightObj.value && doHighlight) {
+        if(highlightObj.highlightValue === 'low'){
+          highlightObj.highlightClass = highlightEl._highlightClass;
+        } else if(highlightObj.highlightValue === 'medium'){
+          if (highlightEl.highlightValue === 'high') {
+            highlightObj.highlightClass = highlightEl._highlightClass;
+          }
+        } else {
+          highlightObj.highlightClass = highlightEl._highlightClass;
+        }
+      } else if(!highlightObj.value) {
+        highlightObj.highlightColor = highlightEl.calculateHighlightColor();
+        highlightObj.value = doHighlight;
+        highlightObj.highlightClass = highlightEl._highlightClass;
+      }
+      // if (highlightEl.highlightType === 'row') {
+      //   console.log(row)
+      //   var rowHO = {};
+      //   rowHO.highlightColor = highlightEl.calculateHighlightColor();
+      //   rowHO.value = doHighlight;
+      //   rowHO.highlightClass = highlightEl._highlightClass;
+      //
+      // }
       return highlightObj;
     },
     _isSelectAllColumn: function(column) {

@@ -107,6 +107,10 @@ Element to define and configure highlighting behaviour for a given column (and h
       highlightValue: {
         type: String,
         value: 'low'
+      },
+      _highlightClass: {
+        type: String,
+        computed: '_computeHighlightClass(highlightValue)'
       }
     },
 
@@ -140,6 +144,9 @@ Element to define and configure highlighting behaviour for a given column (and h
         highlightColorValue = this.getComputedStyleValue(cssVarName);
       }
       return highlightColorValue;
+    },
+    _computeHighlightClass: function(highlightValue) {
+      return 'cell--value__highlight--color__' + highlightValue;
     }
 
   });
