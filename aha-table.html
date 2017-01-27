@@ -329,6 +329,9 @@
     },
     attached: function() {
       this._isAttached = true;
+      // execute content observer (microtask), to ensure distributed children (px-data-table-column)
+      // are *always* observed prior to data (_columnChanged before _dataChanged)
+      Polymer.dom.flush();      
     },
 
     _columnChanged: function(info){
